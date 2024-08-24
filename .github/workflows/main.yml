@@ -18,7 +18,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Run tests
-      run: npm ci && npm run test
+      run: cd frontend && npm ci && npm run test
 
     - name: Approve pull request
       uses: hmarr/auto-approve-action@v4
