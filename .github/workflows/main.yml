@@ -1,0 +1,26 @@
+name: Auto PR reviewer
+
+on:
+  pull_request:
+      branches: [main, stage, development]
+
+permissions: 
+  pull-requests: write
+  contents: read
+
+jobs:
+  autoapproval:
+    runs-on: ubuntu-latest
+    name: Autoapproval
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run tests
+      run: npm ci && npm run test
+
+    - name: Approve pull request
+      uses: hmarr/auto-approve-action@v4
+      with:
+        github-token: "${{ secrets.GITHUB_TOKEN }}"
