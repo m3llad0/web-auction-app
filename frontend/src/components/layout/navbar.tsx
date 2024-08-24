@@ -29,6 +29,7 @@ export default function Navbar() {
                   className="w-full rounded-md bg-transparent text-gray-300 placeholder-gray-400 px-3 py-2 focus:outline-none"
                 />
                 <button
+                  aria-label="Search"
                   type="submit"
                   className="ml-2 rounded-md p-2 text-white  focus:outline-none"
                 >
