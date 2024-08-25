@@ -1,4 +1,4 @@
-name: Auto PR reviewer
+name: Run project tests
 
 on:
   pull_request:
@@ -19,8 +19,3 @@ jobs:
 
     - name: Run tests
       run: cd frontend && npm ci && npm run test
-
-    - name: Approve pull request
-      uses: hmarr/auto-approve-action@v4
-      with:
-        github-token: "${{ secrets.GITHUB_TOKEN }}"
