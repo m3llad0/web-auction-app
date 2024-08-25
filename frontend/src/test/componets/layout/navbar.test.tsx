@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Navbar from '/home/diego/Diego/Scopic/web-auction-app/frontend/src/components/layout/navbar';
+import { Navbar } from '@/components/layout';
 
 describe('Navbar Component', () => {
   test('renders Navbar component', () => {
