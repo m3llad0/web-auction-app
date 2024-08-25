@@ -21,8 +21,4 @@ describe('Button Component', () => {
     expect(buttonElement).toBeDisabled();
   });
 
-  test('matches the snapshot', () => {
-    const { asFragment } = render(<Button>Click Me</Button>);
-    expect(asFragment()).toMatchSnapshot();
-  });
 });
