@@ -1,19 +1,20 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import Server from "./providers/server";
+import * as functions from 'firebase-functions';
+import express from "express";
+import cors from "cors";
+import { ENVIRONMENT } from "./config";
+// import ContactFormController from "./controllers/contactFormController";
 
-import {onRequest} from "firebase-functions/v2/https";
-import * as logger from "firebase-functions/logger";
+const app = new Server({
+    env: ENVIRONMENT,
+    controllers: [
+        // ContactFormController.getInstance(),
+    ],
+    middlewares: [
+        express.json(),
+        express.urlencoded({ extended: true }),
+        cors()
+    ]
+});
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
-
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+export const api = functions.https.onRequest(app.getApp());
