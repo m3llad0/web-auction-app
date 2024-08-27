@@ -37,7 +37,7 @@ export default function Product({ params }: { params: { id: string } }) {
         <div className="bg-white">
             <div className="pt-6">
                 <nav className="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                    <a href="/" className="font-medium text-gray-500 hover:text-gray-600">
+                    <a href="/user" className="font-medium text-gray-500 hover:text-gray-600">
                         <ArrowLeftIcon className="h-5 w-5 inline-block" />
                         <span className="inline-block ml-1">Back</span>
                     </a>
