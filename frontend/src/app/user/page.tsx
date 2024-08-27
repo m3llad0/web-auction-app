@@ -28,8 +28,8 @@ export default async function Home() {
         <section className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
           {products.length > 0 ? (
             products.map((product) => (
-              <Box className="flex-col space-y-5" key={product.id}>
-                <a href = {`/product/${product.id}`}>
+              <Box className="flex-col space-y-5 px-5 py-6" key={product.id}>
+                <a href = {`/user/product/${product.id}`}>
                   <img
                     src={product.img}
                     alt={product.product_name}
