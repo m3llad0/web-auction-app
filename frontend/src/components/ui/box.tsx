@@ -18,9 +18,9 @@ interface BoxProps {
  */
 export default function Box({ children, className }: BoxProps) {
   return (
-    <div className={`flex items-center bg-white rounded-lg border py-4 px-6 ${className}`}>
-      <div className="flex items-stretch">
-        <div className="flex flex-col justify-center">
+    <div className={`flex items-center bg-white rounded-lg border ${className}`}>
+      <div className="flex items-stretch w-full">
+        <div className="flex flex-col justify-center w-full">
           {children}
         </div>
       </div>
