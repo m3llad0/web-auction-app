@@ -1,5 +1,6 @@
 import express from "express";
-
+import db from "../models";
+import { log, info, error } from "firebase-functions/logger";
 /**
  * Server class for setting up an Express.js server.
  */
@@ -22,6 +23,7 @@ class Server{
     }) {
         this.app = express();
         this.env = appInit.env;
+        this.connectDB(); 
         this.loadMiddlewares(appInit.middlewares);
         this.loadControllers(appInit.controllers);
     }
@@ -44,6 +46,16 @@ class Server{
         middlewares.forEach((middleware) => {
             this.app.use(middleware);
         })
+    }
+
+    private async connectDB() {
+        try {
+            await db.sequelize.sync();
+            log('Connected to the database');
+        } catch (err) {
+            // throw new Error('Failed to connect to the database');
+            error('Failed to connect to the database:', err);
+        }
     }
 
     /**
