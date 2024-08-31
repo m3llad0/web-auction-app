@@ -38,7 +38,8 @@ class ItemController extends AbstractController{
 
             return response.status(200).send(items);
         } catch (e) {
-            
+            error(e);
+            return response.status(500).send({message: 'Internal server error'});
         }
     }
 
