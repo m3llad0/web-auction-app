@@ -16,3 +16,4 @@ export const DB_USER_PROD: string = process.env.DB_USER_PROD ? process.env.DB_US
 export const DB_PASSWORD_PROD: string = process.env.DB_PASSWORD_PROD ? process.env.DB_PASSWORD_PROD : 'password';
 export const DB_HOST_PROD: string = process.env.DB_HOST_PROD ? process.env.DB_HOST_PROD : 'localhost';
 export const DB_DIALECT_PROD: string = process.env.DB_DIALECT_PROD ? process.env.DB_DIALECT_PROD : 'mysql';
+export const JWT_SECRET: string = process.env.JWT_SECRET ? process.env.JWT_SECRET : 'secret';
