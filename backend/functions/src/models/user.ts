@@ -1,18 +1,18 @@
 "use strict";
-import { Module } from "module";
-import { Model } from "sequelize";
+import { Model, DataTypes, Sequelize } from "sequelize";
 
 interface UserAttributes {
-    id: number;
+    id?: number;
     name: string;
     lastname: string;
     email: string;
     password: string;
     role: string;
     createdAt: Date;
+    wallet?: number;
 }
 
-module.exports = (sequelize: any, DataTypes: any) => {
+module.exports = (sequelize: Sequelize) => {
     class User extends Model<UserAttributes> implements UserAttributes {
         id!: number;
         name!: string;
@@ -20,17 +20,18 @@ module.exports = (sequelize: any, DataTypes: any) => {
         email!: string;
         password!: string;
         role!: string;
+        wallet!: number;
         createdAt!: Date;
 
         static associate(models: any) {
-            User.hasMany(models.Item, {foreignKey: "created_by", as: "items"});
+            User.hasMany(models.Item, { foreignKey: "created_by", as: "items" });
         }
     }
 
     User.init({
         id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            autoIncrement: true,
             primaryKey: true,
         },
         name: {
@@ -44,6 +45,7 @@ module.exports = (sequelize: any, DataTypes: any) => {
         email: {
             type: DataTypes.STRING,
             allowNull: false,
+            unique: true,
         },
         password: {
             type: DataTypes.STRING,
@@ -53,14 +55,21 @@ module.exports = (sequelize: any, DataTypes: any) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        wallet: {
+            type: DataTypes.FLOAT,
+            allowNull: true,
+            defaultValue: 0,
+        },
         createdAt: {
             type: DataTypes.DATE,
             allowNull: false,
+            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         },
     }, {
         sequelize,
         modelName: 'User',
-        timestamps: true,
+        tableName: 'users',
+        timestamps: false, // Disable updatedAt
     });
 
     return User;
