@@ -1,14 +1,16 @@
 import Server from "./providers/server";
 import * as functions from 'firebase-functions';
 import express from "express";
+import UserController from "./controllers/userController";
+import itemController from "./controllers/itemController";
 import cors from "cors";
 import { ENVIRONMENT } from "./config";
-// import ContactFormController from "./controllers/contactFormController";
 
 const app = new Server({
     env: ENVIRONMENT,
     controllers: [
-        // ContactFormController.getInstance(),
+        UserController.getInstance(),
+        itemController.getInstance(),
     ],
     middlewares: [
         express.json(),
