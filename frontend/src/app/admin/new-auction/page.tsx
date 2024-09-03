@@ -4,14 +4,15 @@ import { useState } from "react";
 import { API_URL } from "@/config";
 import type { Product } from "@/components/interfaces";
 import firebaseStorageService from "@/components/utils/firebaseStorage";
+import Cookies from "js-cookie";
 
 export default function AdminNewAuction() {
     const [product, setProduct] = useState<Product>({
         id: "",
-        product_name: "",
-        current_bid: 0,
+        name: "",
         description: "",
-        starting_date: new Date().toISOString().split("T")[0], // Set to today's date
+        currentBid: 0, // Starting price for the auction
+        starting_date: new Date().toISOString().split("T")[0], 
         finish_date: "",
         created_by: "", // You'll set this based on the user ID
         img: "",
@@ -34,12 +35,16 @@ export default function AdminNewAuction() {
     const validateInputs = () => {
         const newErrors: { [key: string]: string } = {};
 
-        if (!product.product_name.trim()) {
+        if (!product.name.trim()) {
             newErrors.product_name = "Product name is required";
         }
 
         if (!product.description.trim()) {
             newErrors.description = "Description is required";
+        }
+
+        if (product.currentBid <= 0) {
+            newErrors.currentBid = "Starting price must be greater than zero";
         }
 
         if (!product.finish_date) {
@@ -62,6 +67,8 @@ export default function AdminNewAuction() {
         try {
             let updatedProduct = { ...product };
 
+            const token = Cookies.get("token");
+
             if (imageFile) {
                 const imgUrl = await handleImageUpload(imageFile);
                 if (imgUrl) {
@@ -72,9 +79,10 @@ export default function AdminNewAuction() {
 
             console.log("Product data being sent:", updatedProduct);
 
-            const response = await fetch(`${API_URL}/api/v0/products`, {
+            const response = await fetch(`${API_URL}/item/new-item`, {
                 method: "POST",
                 headers: {
+                    Authorization: `${token}`,
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(updatedProduct),
@@ -111,9 +119,9 @@ export default function AdminNewAuction() {
                         <input
                             id="product_name"
                             type="text"
-                            value={product.product_name}
+                            value={product.name}
                             onChange={(e) =>
-                                setProduct((prev) => ({ ...prev, product_name: e.target.value }))
+                                setProduct((prev) => ({ ...prev, name: e.target.value }))
                             }
                             placeholder="Product Name"
                             className={`px-4 py-2 border rounded-md w-full text-gray-800 ${
@@ -142,6 +150,27 @@ export default function AdminNewAuction() {
                         />
                         {errors.description && (
                             <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+                        )}
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="currentBid">
+                            Starting Price
+                        </label>
+                        <input
+                            id="currentBid"
+                            type="number"
+                            value={product.currentBid}
+                            onChange={(e) =>
+                                setProduct((prev) => ({ ...prev, currentBid: parseFloat(e.target.value) }))
+                            }
+                            placeholder="Starting Price"
+                            className={`px-4 py-2 border rounded-md w-full text-gray-800 ${
+                                errors.currentBid ? "border-red-500" : "border-gray-300"
+                            }`}
+                        />
+                        {errors.currentBid && (
+                            <p className="text-red-500 text-sm mt-1">{errors.currentBid}</p>
                         )}
                     </div>
 

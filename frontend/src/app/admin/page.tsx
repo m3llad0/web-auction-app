@@ -28,7 +28,7 @@ export default function AdminPage() {
 
     useEffect(() => {
 
-        (async () => setProducts(await fetchAPI(`${API_URL}/item/my-items`, {
+        (async () => setProducts(await fetchAPI(`${API_URL}/item/admin/my-items`, {
             method: "GET",
             headers: {
                 Authorization: `${token}`,
@@ -41,24 +41,37 @@ export default function AdminPage() {
             setCurrentProduct(product);
             setIsModalOpen(true);
         } else if (action === "delete" && product?.id) {
-            await fetchAPI(`${API_URL}/api/v0/products/${product.id}`, { method: "DELETE" });
+            await fetchAPI(`${API_URL}/item/${product.id}`, { 
+                method: "DELETE",
+                headers: {
+                    Authorization: `${token}`,
+                  },
+         });
             setProducts((prev) => prev.filter(({ id }) => id !== product.id));
         }
     };
 
     const handleSaveChanges = async () => {
+        console.log(token);
         if (currentProduct?.id) {
-            await fetchAPI(`${API_URL}/api/v0/products/${currentProduct.id}`, {
+            const updatedProduct = await fetchAPI(`${API_URL}/item/${currentProduct.id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    Authorization: `${token}`,
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify(currentProduct),
             });
-            setProducts((prev) =>
-                prev.map((p) => (p.id === currentProduct.id ? { ...p, ...currentProduct } : p))
-            );
-            setIsModalOpen(false);
+            
+            if (updatedProduct) {
+                setProducts((prev) =>
+                    prev.map((p) => (p.id === currentProduct.id ? { ...p, ...currentProduct } : p))
+                );
+                setIsModalOpen(false);
+            }
         }
     };
+    
 
     const paginatedProducts = products.slice((page - 1) * limit, page * limit);
     const totalPages = Math.ceil(products.length / limit);

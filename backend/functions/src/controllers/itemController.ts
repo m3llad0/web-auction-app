@@ -25,10 +25,11 @@ class ItemController extends AbstractController {
         this.router.get("/", Authorize, this.getAll);
         this.router.get("/:id", Authorize, this.getOne);
         this.router.post("/new-item", this.create);
-        this.router.put("/:id", Authorize, this.update);
+        this.router.put("/:id", this.update);
         this.router.delete("/:id", Authorize, this.delete);
+        this.router.get("/admin/my-items", Authorize, this.myItems);
+        this.router.put("/bid", Authorize, this.createBid);
 
-        
     }
 
     private async getAll(request: Request, response: Response) {
@@ -42,6 +43,26 @@ class ItemController extends AbstractController {
         }
     }
 
+    private async myItems(request: Request, response: Response) {
+        try {
+            const authorizationHeader = request.headers.authorization;
+            if (!authorizationHeader) {
+                return response.status(401).send({ message: 'Authorization header missing' });
+            }
+    
+            const { id } = verify(authorizationHeader, JWT_SECRET) as JwtPayload;
+    
+            // Fetch items created by the user
+            const items = await db.Item.findAll({
+                where: { created_by: id }
+            });
+    
+            return response.status(200).send(items);
+        } catch (e) {
+            error(e);
+            return response.status(500).send({ message: 'Internal server error' });
+        }
+    }
 
     private async create(request: Request, response: Response) {
         try {
@@ -51,9 +72,9 @@ class ItemController extends AbstractController {
             }
 
             const { id } = verify(authorizationHeader, JWT_SECRET) as JwtPayload;
-            const { name, description, currentBid, finish_date, img } = request.body;
+            const { name, description, currentBid, finish_date, starting_date, img } = request.body;
 
-            if (!name || !description || !currentBid || !finish_date || !img) {
+            if (!name || !description || !currentBid || !finish_date || !starting_date || !img) {
                 return response.status(400).send({ message: 'Missing required fields' });
             }
 
@@ -62,7 +83,7 @@ class ItemController extends AbstractController {
                 name,
                 description,
                 currentBid,
-                starting_date: new Date(),
+                starting_date,
                 finish_date,
                 img
             };
@@ -142,13 +163,14 @@ class ItemController extends AbstractController {
 
     private async createBid(request: Request, response: Response) {
         try {
-            const authorizationHeader = request.headers.authorization;
-            if (!authorizationHeader) {
-                return response.status(401).send({ message: 'Authorization header missing' });
-            }
+            // const authorizationHeader = request.headers.authorization;
+            // if (!authorizationHeader) {
+            //     return response.status(401).send({ message: 'Authorization header missing' });
+            // }
 
-            const { id } = verify(authorizationHeader, JWT_SECRET) as JwtPayload;
-            const { item_id, bid } = request.body;
+            // const { id } = verify(authorizationHeader, JWT_SECRET) as JwtPayload;
+            const { item_id } = request.params;
+            const { bid } = request.body;
 
             if (!item_id || !bid) {
                 return response.status(400).send({ message: 'Missing required fields' });
