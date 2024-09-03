@@ -1,13 +1,12 @@
 import { Request, Response } from "express";
 import AbstractController from "./abstractController";
-import {JwtPayload, verify} from "jsonwebtoken";
+import { JwtPayload, verify } from "jsonwebtoken";
 import Authorize from "../middleware/authMiddleware";
 import { JWT_SECRET } from "../config";
 import db from "../models";
 import { error, log } from "firebase-functions/logger";
 
-
-class ItemController extends AbstractController{
+class ItemController extends AbstractController {
     protected validateBody(type: any) {
         throw new Error("Method not implemented.");
     }
@@ -19,7 +18,7 @@ class ItemController extends AbstractController{
             this.instance = new ItemController('item');
         }
 
-        return this.instance
+        return this.instance;
     }
 
     protected initRoutes(): void {
@@ -39,72 +38,68 @@ class ItemController extends AbstractController{
             return response.status(200).send(items);
         } catch (e) {
             error(e);
-            return response.status(500).send({message: 'Internal server error'});
+            return response.status(500).send({ message: 'Internal server error' });
         }
     }
+
 
     private async create(request: Request, response: Response) {
         try {
             const authorizationHeader = request.headers.authorization;
             if (!authorizationHeader) {
-                return response.status(401).send({message: 'Authorization header missing'});
+                return response.status(401).send({ message: 'Authorization header missing' });
             }
-    
+
             const { id } = verify(authorizationHeader, JWT_SECRET) as JwtPayload;
-            const {name, description, currentBid, finsih_date, img} = request.body;   
-            
-            if (!name || !description || !currentBid || !finsih_date || !img) {
-                return response.status(400).send({message: 'Missing required fields'});
+            const { name, description, currentBid, finish_date, img } = request.body;
+
+            if (!name || !description || !currentBid || !finish_date || !img) {
+                return response.status(400).send({ message: 'Missing required fields' });
             }
-    
+
             const newItem = {
+                created_by: id,
                 name,
                 description,
                 currentBid,
-                finsih_date,
-                created_by: id,
+                starting_date: new Date(),
+                finish_date,
                 img
             };
 
             const item = await db.Item.create(newItem);
 
-            return response.status(201).send({message: 'New auction created!'});
+            return response.status(201).send({ message: 'New auction created!' });
         } catch (e) {
-            error(e);   
-            return response.status(500).send({message: 'Internal server error'});
+            error(e);
+            return response.status(500).send({ message: 'Internal server error' });
         }
-    
     }
 
     private async update(request: Request, response: Response) {
-        try{
-
+        try {
             const item_id = request.params.id;
+            const { name, currentBid, description, starting_date, finish_date, img } = request.body;
 
-            const { product_name, current_bid, description, starting_date, finish_date, created_by, img } = request.body;
+            const item = await db.Item.findOne({ where: { id: item_id } });
 
-            const item = await db.Item.findOne({where: {id: item_id}});
-
-            if(!item){
-                return response.status(404).send({message: 'Item not found'});
+            if (!item) {
+                return response.status(404).send({ message: 'Item not found' });
             }
 
-            item.product_name = product_name;
-            item.current_bid = current_bid;
+            item.name = name;
+            item.currentBid = currentBid;
             item.description = description;
             item.starting_date = starting_date;
             item.finish_date = finish_date;
-            item.created_by = created_by;
             item.img = img;
 
             await item.save();
 
-            return response.status(200).send({message: 'Item updated successfully'});
-
-
-        }catch(e){
+            return response.status(200).send({ message: 'Item updated successfully' });
+        } catch (e) {
             error(e);
-            return response.status(500).send({message: 'Internal server error'});
+            return response.status(500).send({ message: 'Internal server error' });
         }
     }
 
@@ -132,17 +127,16 @@ class ItemController extends AbstractController{
         try {
             const item_id = request.params.id;
 
-            const item = await db.Item.findOne({where: {id: item_id}});
+            const item = await db.Item.findOne({ where: { id: item_id } });
 
             if (!item) {
-                return response.status(404).send({message: 'Item not found'});
+                return response.status(404).send({ message: 'Item not found' });
             }
 
             return response.status(200).send(item);
-
         } catch (e) {
             error(e);
-            return response.status(500).send({message: 'Internal server error'});
+            return response.status(500).send({ message: 'Internal server error' });
         }
     }
 
@@ -150,42 +144,35 @@ class ItemController extends AbstractController{
         try {
             const authorizationHeader = request.headers.authorization;
             if (!authorizationHeader) {
-                return response.status(401).send({message: 'Authorization header missing'});
+                return response.status(401).send({ message: 'Authorization header missing' });
             }
-    
-            const { id } = verify(authorizationHeader, JWT_SECRET) as JwtPayload;
-            const {item_id, bid} = request.body;   
-            
-            if (!item_id || !bid) {
-                return response.status(400).send({message: 'Missing required fields'});
-            }
-    
-            const newBid = {
-                item_id,
-                bid,
-                user_id: id
-            };
 
-            const item = await db.Item.findOne({where: {id: item_id}});
+            const { id } = verify(authorizationHeader, JWT_SECRET) as JwtPayload;
+            const { item_id, bid } = request.body;
+
+            if (!item_id || !bid) {
+                return response.status(400).send({ message: 'Missing required fields' });
+            }
+
+            const item = await db.Item.findOne({ where: { id: item_id } });
 
             if (!item) {
-                return response.status(404).send({message: 'Item not found'});
+                return response.status(404).send({ message: 'Item not found' });
             }
 
             if (bid <= item.currentBid) {
-                return response.status(400).send({message: 'Bid must be higher than the current bid'});
+                return response.status(400).send({ message: 'Bid must be higher than the current bid' });
             }
 
             item.currentBid = bid;
             await item.save();
 
-            return response.status(201).send({message: 'New bid created!'});
+            return response.status(201).send({ message: 'New bid created!' });
         } catch (e) {
-            error(e);   
-            return response.status(500).send({message: 'Internal server error'});
+            error(e);
+            return response.status(500).send({ message: 'Internal server error' });
         }
-    
     }
 }
 
-export default ItemController
+export default ItemController;
