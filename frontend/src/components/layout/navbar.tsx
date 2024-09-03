@@ -1,7 +1,16 @@
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+"use client";
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { Bars3Icon, BellIcon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { signOut } from '../utils/signOut';
+import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    signOut(() => router.push('/'));
+  };
+
   return (
     <Disclosure as="nav" className="bg-white">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -18,7 +27,7 @@ export default function Navbar() {
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-between">
             {/* Logo */}
             <div className="flex flex-shrink-0 items-center">
-              <h1 className=" text-gray-800 text-lg font-bold sm:text-base">Timeless Treasures</h1>
+              <h1 className="text-gray-800 text-lg font-bold sm:text-base">Timeless Treasures</h1>
             </div>
             {/* Search bar in the center */}
             <div className="hidden sm:ml-6 sm:block w-full max-w-lg">
@@ -31,7 +40,7 @@ export default function Navbar() {
                 <button
                   aria-label="Search"
                   type="submit"
-                  className="ml-2 rounded-md p-2 text-white  focus:outline-none"
+                  className="ml-2 rounded-md p-2 text-white focus:outline-none"
                 >
                   <MagnifyingGlassIcon aria-hidden="true" className="h-6 w-6 text-gray-400" />
                 </button>
@@ -40,7 +49,7 @@ export default function Navbar() {
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               <button
                 type="button"
-                className="relative rounded-full  p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                className="relative rounded-full p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
               >
                 <span className="absolute -inset-1.5" />
                 <span className="sr-only">View notifications</span>
@@ -50,7 +59,7 @@ export default function Navbar() {
               {/* Profile dropdown */}
               <Menu as="div" className="relative ml-3">
                 <div>
-                  <MenuButton className="relative flex rounded-full  text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                  <MenuButton className="relative flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">Open user menu</span>
                     <img
@@ -75,9 +84,12 @@ export default function Navbar() {
                     </a>
                   </MenuItem>
                   <MenuItem>
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
+                    <button
+                      onClick={handleSignOut}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
                       Sign out
-                    </a>
+                    </button>
                   </MenuItem>
                 </MenuItems>
               </Menu>
@@ -88,8 +100,9 @@ export default function Navbar() {
 
       <DisclosurePanel className="sm:hidden">
         <div className="space-y-1 px-2 pb-3 pt-2">
+          {/* Add mobile menu items here */}
         </div>
       </DisclosurePanel>
     </Disclosure>
-  )
+  );
 }

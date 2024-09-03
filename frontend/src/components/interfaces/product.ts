@@ -1,7 +1,7 @@
 export interface Product {
     id: string;
-    product_name: string;
-    current_bid: number;
+    name: string;
+    currentBid: number;
     description: string;
     starting_date: string;
     finish_date: string;

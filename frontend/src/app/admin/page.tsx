@@ -5,6 +5,7 @@ import type { Product } from "@/components/interfaces";
 import { API_URL } from "@/config";
 import formatDate from "@/components/utils/formatDate";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
+import Cookies from "js-cookie";
 
 const fetchAPI = async (url: string, options?: RequestInit) => {
     try {
@@ -23,9 +24,16 @@ export default function AdminPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState<Partial<Product> | null>(null);
     const limit = 5;
+    const token = Cookies.get("token");
 
     useEffect(() => {
-        (async () => setProducts(await fetchAPI(`${API_URL}/api/v0/products`) || []))();
+
+        (async () => setProducts(await fetchAPI(`${API_URL}/item/my-items`, {
+            method: "GET",
+            headers: {
+                Authorization: `${token}`,
+            }
+        }) || []))();
     }, []);
 
     const handleAction = async (action: "delete" | "edit", product?: Product) => {
@@ -98,8 +106,8 @@ export default function AdminPage() {
                     <tbody className="bg-white divide-y divide-gray-200">
                         {paginatedProducts.map((product) => (
                             <tr key={product.id}>
-                                <td className="px-6 py-4 text-sm text-gray-900">{product.product_name}</td>
-                                <td className="px-6 py-4 text-sm text-gray-900">${product.current_bid}</td>
+                                <td className="px-6 py-4 text-sm text-gray-900">{product.name}</td>
+                                <td className="px-6 py-4 text-sm text-gray-900">${product.currentBid}</td>
                                 <td className="px-6 py-4 text-sm text-gray-900">{formatDate(product.starting_date)}</td>
                                 <td className="px-6 py-4 text-sm text-gray-900">{formatDate(product.finish_date)}</td>
                                 <td className="px-6 py-4 text-sm text-gray-900">
@@ -135,7 +143,7 @@ export default function AdminPage() {
                         
                         <input
                             type="text"
-                            value={currentProduct.product_name || ""}
+                            value={currentProduct.name || ""}
                             onChange={(e) =>
                                 setCurrentProduct((prev) => ({ ...prev, product_name: e.target.value }))
                             }

@@ -5,14 +5,22 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { CountdownTimer } from '@/components/ui';
 import { API_URL } from '@/config';
 import type { Product } from '@/components/interfaces';
+import Cookies from 'js-cookie';
 
 export default function Product({ params }: { params: { id: string } }) {
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
 
+    console.log(params.id);
     useEffect(() => {
         setLoading(true);
-        fetch(`${API_URL}/api/v0/products/${params.id}`)
+        const token = Cookies.get('token');
+        fetch(`${API_URL}/item/${params.id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `${token}`,
+            },
+        })
             .then(response => response.json())
             .then(data => {
                 setProduct(data);
@@ -48,7 +56,7 @@ export default function Product({ params }: { params: { id: string } }) {
                     <div className="flex justify-center">
                         <div className="aspect-w-1 aspect-h-1 w-full max-w-lg overflow-hidden rounded-lg">
                             <img
-                                alt={product?.product_name}
+                                alt={product?.name}
                                 src={product?.img}
                                 className="h-full w-full object-cover object-center"
                             />
@@ -60,7 +68,7 @@ export default function Product({ params }: { params: { id: string } }) {
                 <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-16">
                     <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
                         <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-                            {product?.product_name}
+                            {product?.name}
                         </h1>
                     </div>
 
@@ -68,7 +76,7 @@ export default function Product({ params }: { params: { id: string } }) {
                     <div className="mt-4 lg:row-span-3 lg:mt-0">
                         <h2 className="sr-only">Product information</h2>
                         <p className="text-sm font-medium text-gray-500">Current bid</p>
-                        <p className="text-3xl tracking-tight text-gray-900">${product?.current_bid}</p>
+                        <p className="text-3xl tracking-tight text-gray-900">${product?.currentBid}</p>
 
                         <form className="mt-10">
                             <button

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import AbstractController from "./abstractController";
 import UserFactory from "../entities/userFactory";
 import db from "../models";
-import { sign } from "jsonwebtoken";
+import { JwtPayload, sign, verify } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { JWT_SECRET } from "../config";
 import { log, error } from "firebase-functions/logger";
@@ -27,6 +27,7 @@ class UserController extends AbstractController{
     protected initRoutes(): void {
         this.router.post("/register", this.register);
         this.router.post("/login", this.login);
+        this.router.get("/role", this.getRole);
         
     }
 
@@ -106,6 +107,33 @@ class UserController extends AbstractController{
             error(e)
             return response.status(500).send({message: 'Internal server error'});
             
+        }
+    }
+
+    private async getRole(request: Request, response: Response) {
+        try {
+            const { authorization } = request.headers;
+
+            log(authorization)
+
+            if (!authorization) {
+                return response.status(400).send({message: 'Missing authorization header'});
+            }
+
+            const { id } = verify(authorization, JWT_SECRET) as JwtPayload;
+
+            const user = await db.User.findOne({where: {id: id}});
+            if (!user) {
+                return response.status(404).send({message: 'User not found'});
+            }
+
+            return response.status(200).send({
+                name: user.name,
+                lastname: user.lastname,
+                role: user.role});
+        } catch (e) {
+            error(e);
+            return response.status(500).send({message: 'Internal server error'});
         }
     }
 

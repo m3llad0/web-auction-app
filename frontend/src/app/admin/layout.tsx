@@ -1,7 +1,16 @@
+"use client";
 import { Sidebar, Header } from "@/components/layout"
 import { BanknotesIcon, ArrowLeftEndOnRectangleIcon, PlusIcon} from "@heroicons/react/24/outline"
+import { signOut } from "@/components/utils/signOut"
+import { useRouter } from "next/navigation";
 
 export default function Layout({children}: {children: React.ReactNode}) {
+    const router = useRouter();
+
+    const handleSignOut = () => {
+      signOut(() => router.push('/'));
+    };
+    
     return(
     <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
     <div className="flex-none h-full">
@@ -12,7 +21,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
             { name: "New product", icon:  <PlusIcon />, link: "/admin/new-auction" },]}
         
         footer = {<div>
-            <button className="flex items-center p-2 rounded-lg text-gray-800  transition-all duration-300 w-full">
+            <button onClick={handleSignOut} className="flex items-center p-2 rounded-lg text-gray-800  transition-all duration-300 w-full">
                 <span className="flex-shrink-0">
                 <ArrowLeftEndOnRectangleIcon className="h-6 w-6"/>
                 </span>

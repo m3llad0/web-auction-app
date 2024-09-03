@@ -1,34 +1,32 @@
 "use strict";
 
-import { Model } from "sequelize";
+import { Model, DataTypes, Sequelize } from "sequelize";
 
 interface ItemAttributes {
-    id: number;
+    id?: number;
     name: string;
     currentBid: number;
     description: string;
     starting_date: Date;
-    finsih_date: Date;
+    finish_date: Date;
     created_by: number;
     img: string;
-    
 }
 
-module.exports = (sequelize: any, DataTypes: any) => {
-    class Item extends Model<ItemAttributes> implements ItemAttributes{
+module.exports = (sequelize: any) => {
+    class Item extends Model<ItemAttributes> implements ItemAttributes {
         id!: number;
         name!: string;
         currentBid!: number;
         description!: string;
         starting_date!: Date;
-        finsih_date!: Date;
+        finish_date!: Date;
         created_by!: number;
         img!: string;
 
-        static associate(models: any){
-            Item.belongsTo(models.User, {foreignKey: "created_by", as: "creator"});
+        static associate(models: any) {
+            Item.belongsTo(models.User, { foreignKey: "created_by", as: "creator" });
         }
-        
     }
 
     Item.init({
@@ -39,8 +37,8 @@ module.exports = (sequelize: any, DataTypes: any) => {
         },
         id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true
+            primaryKey: true,
+            autoIncrement: true
         },
         name: {
             type: DataTypes.STRING,
@@ -58,7 +56,7 @@ module.exports = (sequelize: any, DataTypes: any) => {
             type: DataTypes.DATE,
             allowNull: false
         },
-        finsih_date: {
+        finish_date: {
             type: DataTypes.DATE,
             allowNull: false
         },
@@ -68,8 +66,9 @@ module.exports = (sequelize: any, DataTypes: any) => {
         }
     }, {
         sequelize,
-        modelName: "Item"
-    })
+        modelName: "Item",
+        timestamps: false
+    });
 
     return Item;
 }
