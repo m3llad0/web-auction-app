@@ -27,14 +27,22 @@ export default function AdminPage() {
     const token = Cookies.get("token");
 
     useEffect(() => {
-
-        (async () => setProducts(await fetchAPI(`${API_URL}/item/admin/my-items`, {
+      const fetchData = async () => {
+        try {
+          const data = await fetchAPI(`${API_URL}/item/admin/my-items`, {
             method: "GET",
             headers: {
-                Authorization: `${token}`,
+              Authorization: `${token}`,
             }
-        }) || []))();
-    }, []);
+          });
+          setProducts(data || []);
+        } catch (error) {
+          console.error("Error fetching products:", error);
+        }
+      };
+
+      fetchData();
+    }, [token]);
 
     const handleAction = async (action: "delete" | "edit", product?: Product) => {
         if (action === "edit" && product) {
